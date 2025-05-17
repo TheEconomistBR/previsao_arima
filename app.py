@@ -10,16 +10,33 @@ st.set_page_config(page_title="Painel de Previsão Agro", layout="wide")
 # ======= ESTILO VISUAL =======
 st.markdown("""
 <style>
-h1 { color: #2e7d32; text-align: center; font-size: 36px; }
-section[data-testid="stSidebar"] { background-color: #f0fdf4; padding-top: 2rem; }
-.logo-container img { margin-top: 10px; }
+h1, h2, h3 {
+    font-family: 'Segoe UI', sans-serif;
+}
+section[data-testid="stSidebar"] {
+    background-color: #f7fafc;
+    padding-top: 2rem;
+}
+.logo-container img {
+    margin-top: 10px;
+}
+.stPlotlyChart {
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+.product-card {
+    background-color: #ffffff;
+    padding: 1.5rem;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+    margin-bottom: 2rem;
+}
 footer {visibility: hidden;}
 </style>
 """, unsafe_allow_html=True)
 
 # ======= LOGO E TÍTULO =======
 col_logo, col_title = st.columns([1, 6])
-
 with col_logo:
     st.markdown('<div class="logo-container">', unsafe_allow_html=True)
     st.image("static/images/logo.png", width=150)
@@ -40,7 +57,6 @@ opcoes_horizonte = {
     "24 meses": 24,
     "48 meses": 48
 }
-
 escolha = st.sidebar.radio("Selecione o horizonte de previsão:", list(opcoes_horizonte.keys()))
 horizonte = opcoes_horizonte[escolha]
 
@@ -119,35 +135,43 @@ def prever_serie(df_produto, nome, unidade):
         xaxis_title='Ano',
         yaxis_title=f'Preço deflacionado (R$/{unidade})',
         template='plotly_white',
-        height=500
+        height=500,
+        margin=dict(l=40, r=40, t=50, b=40)
     )
     return fig
 
 # ======= CARREGAR CSV COM TODOS OS PRODUTOS =======
 try:
     df = pd.read_csv("dados/base_unificada_cepea.csv", encoding='latin1')
+    df.columns = [col.strip().lower() for col in df.columns]
+
+    if 'produto' not in df.columns:
+        st.error(f"A coluna 'produto' não foi encontrada. Colunas disponíveis: {df.columns.tolist()}")
+        st.stop()
 except Exception as e:
     st.error(f"Erro ao carregar o CSV: {e}")
     st.stop()
 
-df.columns = [col.strip().lower() for col in df.columns]
 produtos_disponiveis = df['produto'].unique()
 
 # ======= GERAR UM DASHBOARD POR PRODUTO =======
 for produto in produtos_disponiveis:
-    st.markdown("---")
+    st.markdown(f"<div class='product-card'>", unsafe_allow_html=True)
+
     col_img, col_txt = st.columns([1, 6])
     with col_img:
         img_path = f"static/images/{produto.lower()}.png"
         if os.path.exists(img_path):
             st.image(img_path, width=120)
     with col_txt:
-        st.subheader(f"📊 {produto}")
+        st.subheader(f"📊 Previsão: {produto.capitalize()}")
 
     df_prod = df[df['produto'] == produto]
     unidade = "litro" if "leite" in produto.lower() else "saca"
     fig = prever_serie(df_prod, produto, unidade)
     st.plotly_chart(fig, use_container_width=True)
+
+    st.markdown("</div>", unsafe_allow_html=True)
 
 # ======= ASSINATURA FINAL =======
 st.markdown("---")
@@ -157,4 +181,3 @@ st.markdown("""
 🔎 Modelo: ARIMA(2,1,2)  
 📬 Contato: contato@ufsm.com.br
 """)
-
