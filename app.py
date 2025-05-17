@@ -125,7 +125,7 @@ def prever_serie(df_produto, nome, unidade):
 
 # ======= CARREGAR CSV COM TODOS OS PRODUTOS =======
 try:
-    df = pd.read_csv("dados/base_unificada_cepea.csv", encoding='latin1', sep=';')
+    df = pd.read_csv("dados/base_unificada_cepea.csv", encoding='latin1')
 except Exception as e:
     st.error(f"Erro ao carregar o CSV: {e}")
     st.stop()
