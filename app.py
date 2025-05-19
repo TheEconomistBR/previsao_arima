@@ -25,12 +25,12 @@ footer {visibility: hidden;}
 # ======= CABEÇALHO COM LOGO =======
 col1, col2, col3 = st.columns([1, 6, 1])
 with col1:
-    st.image("static/images/logo.png", width=80)
+    st.image("static/images/logo.png", width=120)
 with col2:
     st.title("📈 Previsão de Preços com ARIMA")
     st.caption("Modelo ARIMA ajustado para séries temporais deflacionadas com RMSE dos últimos 12 meses.")
 with col3:
-    st.image("static/images/logo.png", width=80)
+    st.image("static/images/logo.png", width=120)
 
 # ======= EXPLICAÇÃO METODOLÓGICA =======
 with st.expander("📘 Sobre a Metodologia", expanded=False):
