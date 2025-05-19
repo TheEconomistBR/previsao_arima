@@ -5,179 +5,161 @@ import plotly.graph_objects as go
 from statsmodels.tsa.arima.model import ARIMA
 import os
 
+# ========== CONFIGURAÇÃO DA PÁGINA ==========
 st.set_page_config(page_title="Painel de Previsão Agro", layout="wide")
 
-# ======= ESTILO VISUAL =======
+# ========== ESTILIZAÇÃO ==========
 st.markdown("""
 <style>
+/* Cabeçalhos e fontes */
 h1, h2, h3 {
     font-family: 'Segoe UI', sans-serif;
 }
+/* Sidebar */
 section[data-testid="stSidebar"] {
-    background-color: #f7fafc;
-    padding-top: 2rem;
+    background-color: #f8f9fa;
+    padding-top: 1.5rem;
 }
-.logo-container img {
-    margin-top: 10px;
-}
+/* Estilo de gráfico */
 .stPlotlyChart {
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    border-radius: 6px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
 }
-.product-card {
+/* Cartão por produto */
+.card-container {
     background-color: #ffffff;
     padding: 1.5rem;
     border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
     margin-bottom: 2rem;
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.04);
 }
 footer {visibility: hidden;}
 </style>
 """, unsafe_allow_html=True)
 
-# ======= LOGO E TÍTULO =======
+# ========== LOGO E TÍTULO ==========
 col_logo, col_title = st.columns([1, 6])
 with col_logo:
-    st.markdown('<div class="logo-container">', unsafe_allow_html=True)
-    st.image("static/images/logo.png", width=150)
-    st.markdown('</div>', unsafe_allow_html=True)
-
+    st.image("static/images/logo.png", width=120)
 with col_title:
-    st.markdown("## **Previsão de Preços Agro**")
-    st.markdown("### Análise e previsão de preços agropecuários no RS com modelo ARIMA.")
+    st.markdown("## **Painel de Previsão de Preços Agropecuários**")
+    st.caption("Análises temporais com ARIMA para o estado do Rio Grande do Sul.")
 
 st.markdown("---")
 
-# ======= SIDEBAR =======
-st.sidebar.markdown("## 📈 Parâmetros da Previsão")
+# ========== SIDEBAR ==========
+st.sidebar.header("🔧 Parâmetros")
+horizontes = {"6 meses": 6, "12 meses": 12, "24 meses": 24, "48 meses": 48}
+horizonte = st.sidebar.radio("Horizonte de Previsão:", list(horizontes.keys()))
+n_meses = horizontes[horizonte]
+st.sidebar.caption("Modelo ARIMA(2,1,2) aplicado. Estimativas sujeitas a revisão.")
 
-opcoes_horizonte = {
-    "6 meses": 6,
-    "12 meses": 12,
-    "24 meses": 24,
-    "48 meses": 48
-}
-escolha = st.sidebar.radio("Selecione o horizonte de previsão:", list(opcoes_horizonte.keys()))
-horizonte = opcoes_horizonte[escolha]
-
-st.sidebar.caption("Resultados baseados no modelo ARIMA(2,1,2). Estimativas aproximadas.")
-
-# ======= FUNÇÃO DE PREVISÃO =======
-def prever_serie(df_produto, nome, unidade):
-    df = df_produto.copy()
+# ========== FUNÇÃO DE PREVISÃO ==========
+def gerar_previsao(df, nome, unidade):
+    df = df.copy()
     df['preco_deflacionado'] = df['preco_deflacionado'].astype(str).str.replace(' ', '').str.replace(',', '.').astype(float)
 
-    meses_pt_en = {
+    meses = {
         'janeiro': 'January', 'fevereiro': 'February', 'março': 'March',
         'abril': 'April', 'maio': 'May', 'junho': 'June',
         'julho': 'July', 'agosto': 'August', 'setembro': 'September',
         'outubro': 'October', 'novembro': 'November', 'dezembro': 'December'
     }
 
-    df['mes_en'] = df['mes'].str.strip().str.lower().map(meses_pt_en)
+    df['mes_en'] = df['mes'].str.lower().str.strip().map(meses)
     df['data'] = pd.to_datetime(df['ano'].astype(str) + '-' + df['mes_en'], format='%Y-%B', errors='coerce')
-    df = df.dropna(subset=['data']).sort_values('data')
-    df.set_index('data', inplace=True)
+    df = df.dropna(subset=['data']).sort_values('data').set_index('data')
 
     serie = df['preco_deflacionado']
 
     if len(serie.dropna()) < 24 or serie.nunique() < 5:
-        st.warning(f"A série de {nome} tem dados insuficientes ou pouca variação.")
+        st.warning(f"⚠️ Série '{nome}' possui dados insuficientes ou pouca variação.")
         return go.Figure()
 
     try:
-        modelo = ARIMA(serie, order=(2,1,2)).fit()
+        modelo = ARIMA(serie, order=(2, 1, 2)).fit()
+        previsao = modelo.get_forecast(steps=n_meses)
     except Exception as e:
-        st.error(f"Erro ao ajustar ARIMA para {nome}: {str(e)}")
+        st.error(f"Erro no ARIMA para {nome}: {e}")
         return go.Figure()
 
-    previsao = modelo.get_forecast(steps=horizonte)
     media = previsao.predicted_mean
     intervalo = previsao.conf_int()
-    datas = pd.date_range(serie.index[-1] + pd.offsets.MonthBegin(1), periods=horizonte, freq='MS')
-    customdata = np.stack((media, intervalo.iloc[:, 0], intervalo.iloc[:, 1]), axis=-1)
+    datas_prev = pd.date_range(start=serie.index[-1] + pd.offsets.MonthBegin(1), periods=n_meses, freq='MS')
+    customdata = np.stack([media, intervalo.iloc[:, 0], intervalo.iloc[:, 1]], axis=-1)
 
     fig = go.Figure()
 
     fig.add_trace(go.Scatter(
-        x=serie.index, y=serie,
-        mode='lines',
-        name='Histórico',
+        x=serie.index, y=serie, mode='lines', name='Histórico',
         line=dict(color='black', width=2)
     ))
 
     fig.add_trace(go.Scatter(
-        x=datas,
-        y=media,
-        mode='lines',
-        name='Previsão',
+        x=datas_prev, y=media, mode='lines', name='Previsão',
         line=dict(color='orange', dash='dot'),
         customdata=customdata,
-        hovertemplate=
+        hovertemplate=(
             '<b>Data:</b> %{x|%b/%Y}<br>' +
             f'<b>Previsão:</b> R$ %{{customdata[0]:.2f}}/{unidade}<br>' +
             f'<b>IC Inferior:</b> R$ %{{customdata[1]:.2f}}<br>' +
             f'<b>IC Superior:</b> R$ %{{customdata[2]:.2f}}<extra></extra>'
+        )
     ))
 
     fig.add_trace(go.Scatter(
-        x=np.concatenate([datas, datas[::-1]]),
+        x=np.concatenate([datas_prev, datas_prev[::-1]]),
         y=np.concatenate([intervalo.iloc[:, 0], intervalo.iloc[:, 1][::-1]]),
-        fill='toself',
-        fillcolor='rgba(0,176,246,0.2)',
-        line=dict(color='rgba(255,255,255,0)'),
-        hoverinfo='skip',
-        showlegend=False
+        fill='toself', fillcolor='rgba(0,176,246,0.2)',
+        line=dict(color='rgba(255,255,255,0)'), showlegend=False, hoverinfo='skip'
     ))
 
     fig.update_layout(
-        title=f'{nome} - Previsão para {horizonte} meses',
-        xaxis_title='Ano',
-        yaxis_title=f'Preço deflacionado (R$/{unidade})',
-        template='plotly_white',
-        height=500,
-        margin=dict(l=40, r=40, t=50, b=40)
+        title=f"{nome} - Previsão para {n_meses} meses",
+        xaxis_title="Ano",
+        yaxis_title=f"Preço deflacionado (R$/{unidade})",
+        template="plotly_white",
+        height=480,
+        margin=dict(l=30, r=30, t=50, b=30)
     )
+
     return fig
 
-# ======= CARREGAR CSV COM TODOS OS PRODUTOS =======
+# ========== CARREGAMENTO DOS DADOS ==========
 try:
-    df = pd.read_csv("dados/base_unificada_cepea.csv", encoding='latin1')
-    df.columns = [col.strip().lower() for col in df.columns]
-
-    if 'produto' not in df.columns:
-        st.error(f"A coluna 'produto' não foi encontrada. Colunas disponíveis: {df.columns.tolist()}")
+    df_base = pd.read_csv("dados/base_unificada_cepea.csv", encoding="latin1")
+    df_base.columns = [col.lower().strip() for col in df_base.columns]
+    if 'produto' not in df_base.columns:
+        st.error(f"Coluna 'produto' ausente. Verifique as colunas disponíveis: {df_base.columns.tolist()}")
         st.stop()
 except Exception as e:
-    st.error(f"Erro ao carregar o CSV: {e}")
+    st.error(f"Erro ao carregar base de dados: {e}")
     st.stop()
 
-produtos_disponiveis = df['produto'].unique()
+# ========== DASHBOARD POR PRODUTO ==========
+for produto in df_base['produto'].unique():
+    st.markdown('<div class="card-container">', unsafe_allow_html=True)
 
-# ======= GERAR UM DASHBOARD POR PRODUTO =======
-for produto in produtos_disponiveis:
-    st.markdown(f"<div class='product-card'>", unsafe_allow_html=True)
-
-    col_img, col_txt = st.columns([1, 6])
+    col_img, col_info = st.columns([1, 6])
     with col_img:
         img_path = f"static/images/{produto.lower()}.png"
         if os.path.exists(img_path):
-            st.image(img_path, width=120)
-    with col_txt:
-        st.subheader(f"📊 Previsão: {produto.capitalize()}")
+            st.image(img_path, width=100)
+    with col_info:
+        st.subheader(f"📊 {produto.capitalize()}")
 
-    df_prod = df[df['produto'] == produto]
+    df_prod = df_base[df_base['produto'] == produto]
     unidade = "litro" if "leite" in produto.lower() else "saca"
-    fig = prever_serie(df_prod, produto, unidade)
-    st.plotly_chart(fig, use_container_width=True)
+    grafico = gerar_previsao(df_prod, produto, unidade)
+    st.plotly_chart(grafico, use_container_width=True)
 
     st.markdown("</div>", unsafe_allow_html=True)
 
-# ======= ASSINATURA FINAL =======
+# ========== RODAPÉ ==========
 st.markdown("---")
 st.markdown("""
 📊 Desenvolvido por **Lucas França e Paola Conti**  
 📅 Última atualização: Maio/2025  
-🔎 Modelo: ARIMA(2,1,2)  
-📬 Contato: contato@ufsm.com.br
+🔍 Modelo aplicado: ARIMA(2,1,2)  
+📩 Contato: contato@ufsm.com.br
 """)
