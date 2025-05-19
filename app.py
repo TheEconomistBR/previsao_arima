@@ -31,6 +31,25 @@ with col2:
     st.caption("Modelo ARIMA ajustado para séries temporais deflacionadas com RMSE dos últimos 12 meses.")
 
 
+with st.expander("👩‍🎓 Sobre este Projeto Acadêmico", expanded=False):
+    st.markdown("""
+Este painel foi desenvolvido de forma independente por dois alunos de mestrado — **Lucas França** e **Paola Conti** — movidos pelo interesse em aplicar conceitos de séries temporais a um tema relevante e concreto: os preços agropecuários.
+
+Ambos são estudantes do **Programa de Pós-Graduação em Agronegócios da Universidade Federal de Santa Maria (PPGAGR/UFSM-PM)** e, embora este projeto não integre formalmente nenhuma disciplina ou dissertação, reflete o desejo de explorar na prática as ferramentas quantitativas aprendidas em sala, unindo pesquisa, visualização de dados e aplicação real.
+
+A proposta integra elementos de:
+
+- Modelagem de séries temporais aplicadas ao agronegócio;
+- Visualização interativa de dados com foco em preços deflacionados;
+- Apoio à tomada de decisão com base em métricas de desempenho como o RMSE.
+
+Este projeto visa combinar rigor técnico com aplicabilidade prática no contexto da previsão de preços agrícolas, especialmente voltada ao estado do Rio Grande do Sul.
+
+📚 **Orientação:** Prof. Dr. Gabriel Nunes de Oliveira  e Vinicius 
+📅 **Período de desenvolvimento:** 2025
+""")
+
+
 # ======= EXPLICAÇÃO METODOLÓGICA =======
 with st.expander("📘 Sobre a Metodologia", expanded=False):
     st.markdown("""
@@ -75,6 +94,7 @@ Se você ativar o **AutoARIMA**, o sistema escolhe automaticamente os melhores v
 
 O RMSE (Root Mean Squared Error) calcula o erro médio da previsão nos últimos 12 meses. Valores menores indicam previsões mais próximas dos valores reais.
 """)
+
 
 # ======= SIDEBAR COM LOGO =======
 st.sidebar.image("static/images/logo_ufsm.png", width=120)
