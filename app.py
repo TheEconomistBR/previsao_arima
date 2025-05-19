@@ -33,10 +33,9 @@ with col2:
 
 with st.expander("👩‍🎓 Sobre este Projeto Acadêmico", expanded=False):
     st.markdown("""
-Este painel foi desenvolvido de forma independente por dois alunos de mestrado — **Lucas França** e **Paola Conti** — movidos pelo interesse em aplicar conceitos de séries temporais a um tema relevante e concreto: os preços agropecuários.
+Este painel foi desenvolvido de forma independente por Lucas França e Paola Conti, mestrandos do Programa de Pós-Graduação em Agronegócios da Universidade Federal de Santa Maria (PPGAGR/UFSM-PM). A iniciativa surgiu do interesse pessoal em aplicar, de maneira prática, conceitos de séries temporais a um tema relevante e concreto: os preços agropecuários.
 
-Ambos são estudantes do **Programa de Pós-Graduação em Agronegócios da Universidade Federal de Santa Maria (PPGAGR/UFSM-PM)** e, embora este projeto não integre formalmente nenhuma disciplina ou dissertação, reflete o desejo de explorar na prática as ferramentas quantitativas aprendidas em sala, unindo pesquisa, visualização de dados e aplicação real.
-
+Embora não esteja vinculado formalmente a uma disciplina ou dissertação específica, o projeto reflete a vontade de explorar as ferramentas quantitativas aprendidas em sala de aula, aliando pesquisa, visualização de dados e aplicação real.
 A proposta integra elementos de:
 
 - Modelagem de séries temporais aplicadas ao agronegócio;
