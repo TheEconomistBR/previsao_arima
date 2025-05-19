@@ -197,9 +197,16 @@ except Exception as e:
 
 # ======= RODAPÉ =======
 st.markdown("---")
+
+# Define a descrição do modelo
+modelo_usado = "AutoARIMA (seleção automática)" if usar_autoarima else f"ARIMA escolhido manualmente ({p}, {d}, {q})"
+
 st.markdown(f"""
-📊 Desenvolvido por **Lucas França e Paola Conti**  
+🔧 **Projeto desenvolvido por:** Lucas França e Paola Conti  
+🎓 Programa de Pós-Graduação em Agronegócios – UFSM (PPGAGR/UFSM-PM)  
 📅 Atualizado em Maio/2025  
-🔍 Modelo ARIMA({p},{d},{q}) aplicado  
-📩 Contato: contato@ufsm.com.br
+📈 Modelo utilizado: {modelo_usado}  
+📬 Contato: [lucas.tanaro@acad.ufsm.br](mailto:lucas.tanaro@acad.ufsm.br)
 """)
+
+
