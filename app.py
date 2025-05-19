@@ -31,7 +31,6 @@ d = st.sidebar.slider("Diferenciação (d)", 0, 2, 1)
 q = st.sidebar.slider("MA (q)", 0, 5, 2)
 
 # ========== FUNÇÕES ==========
-@st.cache_data
 def carregar_base():
     df = pd.read_csv("dados/base_unificada_cepea.csv", encoding="latin1")
     df.columns = [col.lower().strip() for col in df.columns]
@@ -103,20 +102,6 @@ try:
     fig = gerar_grafico(serie, datas_prev, media_prev, intervalo_prev, unidade)
     st.plotly_chart(fig, use_container_width=True)
 
-    # Tabela
-    st.markdown("### 📋 Tabela de Previsão")
-    df_tabela = pd.DataFrame({
-        "Data": datas_prev,
-        "Previsão (R$)": media_prev.values,
-        "IC Inferior": intervalo_prev.iloc[:, 0].values,
-        "IC Superior": intervalo_prev.iloc[:, 1].values
-    })
-    st.dataframe(df_tabela.style.format({"Previsão (R$)": "{:.2f}", "IC Inferior": "{:.2f}", "IC Superior": "{:.2f}"}))
-
-    # Download CSV
-    csv = df_tabela.to_csv(index=False).encode('utf-8')
-    st.download_button("📥 Baixar Previsão (CSV)", data=csv, file_name=f"previsao_arima_{produto}.csv", mime="text/csv")
-
     # RMSE
     if rmse:
         st.metric("RMSE (últimos 12 meses)", f"{rmse:.2f}")
@@ -126,7 +111,7 @@ try:
 except Exception as e:
     st.error(f"Erro ao calcular previsão: {e}")
 
-# Rodapé
+# ========== RODAPÉ ==========
 st.markdown("---")
 st.markdown(f"""
 📊 Desenvolvido por **Lucas França e Paola Conti**  
