@@ -6,6 +6,5 @@ statsmodels==0.14.1
 scikit-learn==1.4.2
 prophet==1.1.6
 pmdarima==2.0.4
-matplotlib
-reportlab
-
+matplotlib==3.8.4
+reportlab==4.1.0
