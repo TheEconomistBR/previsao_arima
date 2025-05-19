@@ -211,7 +211,8 @@ try:
     )
 
 except Exception as e:
-    st.error(f"Erro ao calcular previsão: {e}")
+    st.error(f"Erro ao calcular previsão: {repr(e)}")
+
 
 # ======= RODAPÉ =======
 st.markdown("---")
