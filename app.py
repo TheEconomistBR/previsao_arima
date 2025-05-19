@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 import plotly.graph_objects as go
 from statsmodels.tsa.arima.model import ARIMA
-from prophet import Prophet
+from fbprophet import Prophet
 from sklearn.metrics import mean_squared_error
 import os
 
