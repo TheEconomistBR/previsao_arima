@@ -29,8 +29,7 @@ with col1:
 with col2:
     st.title("📈 Previsão de Preços com ARIMA")
     st.caption("Modelo ARIMA ajustado para séries temporais deflacionadas com RMSE dos últimos 12 meses.")
-with col3:
-    st.image("static/images/logo.png", width=120)
+
 
 # ======= EXPLICAÇÃO METODOLÓGICA =======
 with st.expander("📘 Sobre a Metodologia", expanded=False):
@@ -78,7 +77,7 @@ O RMSE (Root Mean Squared Error) calcula o erro médio da previsão nos últimos
 """)
 
 # ======= SIDEBAR COM LOGO =======
-st.sidebar.markdown('<div class="sidebar-logo"><img src="static/images/logo_ufsm.png" width="120"></div>', unsafe_allow_html=True)
+st.sidebar.image("static/images/logo_ufsm.png", width=120)
 st.sidebar.header("Parâmetros")
 
 horizontes = {"6 meses": 6, "12 meses": 12, "24 meses": 24, "48 meses": 48}
