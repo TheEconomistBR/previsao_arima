@@ -19,6 +19,22 @@ footer {visibility: hidden;}
 st.title("📈 Previsão de Preços com ARIMA")
 st.caption("Personalize os parâmetros do modelo ARIMA e visualize a previsão.")
 
+# ========== EXPLICAÇÃO METODOLÓGICA ==========
+with st.expander("📘 Sobre a Metodologia", expanded=False):
+    st.markdown("""
+**Modelo ARIMA (AutoRegressive Integrated Moving Average)**
+
+- Requer que a série seja estacionária ou transformada em estacionária.
+- Seus componentes:
+  - **p (autoregressivo)**: número de períodos passados considerados.
+  - **d (diferenciação)**: quantas vezes subtrair a série de si mesma para remover tendência.
+  - **q (média móvel)**: número de erros passados utilizados para correção.
+
+**Exemplo clássico**: ARIMA(2,1,2) — bastante usado para séries econômicas mensais com tendência leve.
+
+As previsões neste painel utilizam dados deflacionados e são feitas para horizontes de 6 a 48 meses.
+""")
+
 # ========== SIDEBAR ==========
 st.sidebar.header("Parâmetros")
 horizontes = {"6 meses": 6, "12 meses": 12, "24 meses": 24, "48 meses": 48}
@@ -70,14 +86,39 @@ def calcular_rmse(serie, p, d, q):
         return None
 
 def gerar_grafico(serie, datas, media, intervalo, unidade):
+    customdata = np.stack([media, intervalo.iloc[:, 0], intervalo.iloc[:, 1]], axis=-1)
+
     fig = go.Figure()
-    fig.add_trace(go.Scatter(x=serie.index, y=serie, name="Histórico", line=dict(color="black")))
-    fig.add_trace(go.Scatter(x=datas, y=media, name="Previsão ARIMA", line=dict(color="orange")))
+
+    fig.add_trace(go.Scatter(
+        x=serie.index, y=serie,
+        name="Histórico", mode="lines",
+        line=dict(color="black")
+    ))
+
+    fig.add_trace(go.Scatter(
+        x=datas, y=media,
+        name="Previsão ARIMA",
+        mode="lines+markers",
+        line=dict(color="orange"),
+        marker=dict(size=6),
+        customdata=customdata,
+        hovertemplate=(
+            "<b>Data:</b> %{x|%b/%Y}<br>" +
+            f"<b>Previsão:</b> R$ %{{customdata[0]:.2f}}/{unidade}<br>" +
+            "<b>IC Inferior:</b> R$ %{customdata[1]:.2f}<br>" +
+            "<b>IC Superior:</b> R$ %{customdata[2]:.2f}<extra></extra>"
+        )
+    ))
+
     fig.add_trace(go.Scatter(
         x=np.concatenate([datas, datas[::-1]]),
         y=np.concatenate([intervalo.iloc[:, 0], intervalo.iloc[:, 1][::-1]]),
-        fill='toself', fillcolor='rgba(255,165,0,0.2)', line=dict(color='rgba(255,255,255,0)'), showlegend=False
+        fill='toself', fillcolor='rgba(255,165,0,0.2)',
+        line=dict(color='rgba(255,255,255,0)'), showlegend=False,
+        hoverinfo='skip'
     ))
+
     fig.update_layout(
         title=f"Previsão para {n_meses} meses com ARIMA({p},{d},{q})",
         xaxis_title="Data",
@@ -85,6 +126,7 @@ def gerar_grafico(serie, datas, media, intervalo, unidade):
         template="plotly_white",
         height=480
     )
+
     return fig
 
 # ========== EXECUÇÃO ==========
