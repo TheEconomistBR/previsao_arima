@@ -163,11 +163,16 @@ try:
     rmse = calcular_rmse(serie, p, d, q)
     fig = gerar_grafico(serie, datas_prev, media_prev, intervalo_prev, unidade)
     st.plotly_chart(fig, use_container_width=True)
+    
     if rmse:
         st.metric("RMSE (últimos 12 meses)", f"{rmse:.2f}")
         st.caption("O RMSE (Root Mean Squared Error) mede o erro médio entre os valores reais e previstos nos últimos 12 meses da série histórica. Quanto menor o RMSE, melhor o desempenho do modelo na previsão recente.")
     else:
         st.warning("Não foi possível calcular o RMSE (dados insuficientes).")
+
+except Exception as e:
+    st.error(f"Erro ao calcular previsão: {e}")
+
 
 
 
