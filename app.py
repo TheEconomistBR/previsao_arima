@@ -25,7 +25,7 @@ footer {visibility: hidden;}
 # ======= CABEÇALHO COM LOGO =======
 col1, col2, col3 = st.columns([1, 6, 1])
 with col1:
-    st.image("static/images/logo.png", width=120)
+    st.image("static/images/logo.png", width=150)
 with col2:
     st.title("📈 Previsão de Preços Agrícolas no Rio Grande do Sul")
     st.caption("Modelo ARIMA ajustado para séries temporais deflacionadas com RMSE dos últimos 12 meses.")
