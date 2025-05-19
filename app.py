@@ -7,7 +7,7 @@ from pmdarima.arima import auto_arima
 from sklearn.metrics import mean_squared_error
 import os
 
-st.set_page_config(page_title="Previsão ARIMA", layout="wide")
+st.set_page_config(page_title="Previsão Agro-ARIMA", layout="wide")
 
 # ======= ESTILO =======
 st.markdown("""
@@ -27,7 +27,7 @@ col1, col2, col3 = st.columns([1, 6, 1])
 with col1:
     st.image("static/images/logo.png", width=120)
 with col2:
-    st.title("📈 Previsão de Preços com ARIMA")
+    st.title("📈 Previsão de Preços Agrícolas no Rio Grande do Sul")
     st.caption("Modelo ARIMA ajustado para séries temporais deflacionadas com RMSE dos últimos 12 meses.")
 
 
@@ -52,6 +52,14 @@ Este projeto visa combinar rigor técnico com aplicabilidade prática no context
 # ======= EXPLICAÇÃO METODOLÓGICA =======
 with st.expander("📘 Sobre a Metodologia", expanded=False):
     st.markdown("""
+
+### 📈 Fontes e Deflação
+
+Os dados utilizados neste painel foram obtidos do **CEPEA/ESALQ/USP**, com atualização mensal para diversos produtos agropecuários.  
+Todos os preços foram **deflacionados com base no índice IGP-DI da Fundação Getulio Vargas (FGV)**, assegurando que as séries representem valores reais ao longo do tempo.
+
+---
+
 ### 🔍 O que é ARIMA?
 
 **ARIMA** significa:  
