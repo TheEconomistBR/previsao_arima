@@ -44,7 +44,7 @@ A proposta integra elementos de:
 
 Este projeto visa combinar rigor técnico com aplicabilidade prática no contexto da previsão de preços agrícolas, especialmente voltada ao estado do Rio Grande do Sul.
 
-📚 **Orientação:** Prof. Dr. Gabriel Nunes de Oliveira  e Vinicius 
+📚 **Orientação:** Prof. Dr. Gabriel Nunes de Oliveira, Nilson Luiz Costa e Vinícius Spirandelli Carvalho 
 📅 **Período de desenvolvimento:** 2025
 """)
 
