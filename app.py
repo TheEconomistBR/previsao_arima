@@ -5,12 +5,6 @@ import plotly.graph_objects as go
 from statsmodels.tsa.arima.model import ARIMA
 from pmdarima.arima import auto_arima
 from sklearn.metrics import mean_squared_error
-import matplotlib.pyplot as plt
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, Image
-from reportlab.lib.pagesizes import A4
-from reportlab.lib.styles import getSampleStyleSheet
-from reportlab.lib.units import inch
-from io import BytesIO
 import os
 
 st.set_page_config(page_title="Previsão ARIMA", layout="wide")
@@ -20,11 +14,23 @@ st.markdown("""
 <style>
 h1, h2, h3 { font-family: 'Segoe UI', sans-serif; }
 footer {visibility: hidden;}
+.sidebar-logo {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1rem;
+}
 </style>
 """, unsafe_allow_html=True)
 
-st.title("📈 Previsão de Preços com ARIMA")
-st.caption("Modelo ARIMA ajustado para séries temporais deflacionadas com RMSE dos últimos 12 meses.")
+# ======= CABEÇALHO COM LOGO =======
+col1, col2, col3 = st.columns([1, 6, 1])
+with col1:
+    st.image("static/images/logo.png", width=80)
+with col2:
+    st.title("📈 Previsão de Preços com ARIMA")
+    st.caption("Modelo ARIMA ajustado para séries temporais deflacionadas com RMSE dos últimos 12 meses.")
+with col3:
+    st.image("static/images/logo2.png", width=80)
 
 # ======= EXPLICAÇÃO METODOLÓGICA =======
 with st.expander("📘 Sobre a Metodologia", expanded=False):
@@ -36,11 +42,11 @@ with st.expander("📘 Sobre a Metodologia", expanded=False):
 - **I (d)**: Parte de integração (diferença)  
 - **MA (q)**: Parte de média móvel  
 
-O modelo ARIMA é últil para **previsão de séries temporais** e combina três componentes:
+O modelo ARIMA é útil para **previsão de séries temporais** e combina três componentes:
 
 ---
 
-### 🧹 Parâmetros do modelo ARIMA(p, d, q):
+### 🧩 Parâmetros do modelo ARIMA(p, d, q):
 
 - **p (Autoregressivo - AR):**
   - Número de observações passadas consideradas como preditores.
@@ -60,7 +66,7 @@ O modelo ARIMA é últil para **previsão de séries temporais** e combina três
 
 ---
 
-### 📚 AutoARIMA
+### 📘 AutoARIMA
 
 Se você ativar o **AutoARIMA**, o sistema escolhe automaticamente os melhores valores de p, d e q com base em testes estatísticos (AIC, BIC). Isso ajuda a evitar ajustes manuais e otimiza o desempenho da previsão.
 
@@ -71,8 +77,10 @@ Se você ativar o **AutoARIMA**, o sistema escolhe automaticamente os melhores v
 O RMSE (Root Mean Squared Error) calcula o erro médio da previsão nos últimos 12 meses. Valores menores indicam previsões mais próximas dos valores reais.
 """)
 
-# ======= SIDEBAR =======
+# ======= SIDEBAR COM LOGO =======
+st.sidebar.markdown('<div class="sidebar-logo"><img src="static/images/logo_ufsm.png" width="120"></div>', unsafe_allow_html=True)
 st.sidebar.header("Parâmetros")
+
 horizontes = {"6 meses": 6, "12 meses": 12, "24 meses": 24, "48 meses": 48}
 horizonte_nome = st.sidebar.radio("Horizonte de Previsão", list(horizontes.keys()))
 n_meses = horizontes[horizonte_nome]
