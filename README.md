@@ -14,7 +14,7 @@ O painel permite:
 
 ## 🎓 Contexto Acadêmico
 
-Este painel foi desenvolvido como produto técnico-científico dos alunos **Lucas França** e **Paola Conti**, vinculados ao **Programa de Pós-Graduação em Economia** da **Universidade Federal de Santa Maria (UFSM)**.
+Este painel foi desenvolvido como produto técnico-científico dos alunos **Lucas França** e **Paola Conti**, vinculados ao **Programa de Pós-Graduação em Agronegócios** da **Universidade Federal de Santa Maria (UFSM)**.
 
 ### Objetivos Acadêmicos:
 
@@ -23,7 +23,7 @@ Este painel foi desenvolvido como produto técnico-científico dos alunos **Luca
 * Desenvolver produto tecnológico replicável com fins de extensão ou aplicação prática.
 
 > 📅 **Ano de desenvolvimento:** 2025
-> 👩‍🎓 **Orientador(a):** Prof. Dr. Nome do Orientador
+> 👩‍🎓 **Orientador(a):** Prof. Dr. Gabriel Nunes de Oliveira e Vinicius 
 > 📄 Este projeto poderá ser incluído em anexo a um TCC, dissertação ou relatório final de projeto de pesquisa.
 
 ---
@@ -73,7 +73,7 @@ streamlit run app.py
 * Paola Conti
 
 **Instituição:** Universidade Federal de Santa Maria (UFSM)
-**Curso:** Mestrado em Economia
+**Curso:** Mestrado em Agronegócios
 **Ano:** 2025
 
 ---
