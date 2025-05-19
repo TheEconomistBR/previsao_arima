@@ -141,45 +141,6 @@ def gerar_grafico(serie, datas, media, intervalo, unidade):
     fig.update_layout(title=f"Previsão para {n_meses} meses com ARIMA({p},{d},{q})", xaxis_title="Data", yaxis_title=f"Preço deflacionado (R$/{unidade})", template="plotly_white", height=480)
     return fig
 
-def gerar_pdf(produto, modelo_arima, datas, media, intervalo, unidade):
-    buffer = BytesIO()
-    doc = SimpleDocTemplate(buffer, pagesize=A4)
-    styles = getSampleStyleSheet()
-    story = []
-    logo_path = "static/images/logo.png"
-    if os.path.exists(logo_path):
-        story.append(Image(logo_path, width=2*inch, height=1*inch))
-    story.append(Paragraph("EconoMetrika Inteligência em Negócios", styles["Title"]))
-    story.append(Spacer(1, 12))
-    story.append(Paragraph(f"<b>Previsão de Preço - {produto.title()}</b>", styles["Heading2"]))
-    story.append(Paragraph(f"Modelo ARIMA aplicado: ({modelo_arima[0]},{modelo_arima[1]},{modelo_arima[2]})", styles["Normal"]))
-    story.append(Spacer(1, 12))
-    dados = [["Data", "Previsão (R$)", "IC Inferior", "IC Superior"]]
-    for i in range(len(datas)):
-        dados.append([
-            datas[i].strftime("%b/%Y"),
-            f"{media[i]:.2f}",
-            f"{intervalo.iloc[i, 0]:.2f}",
-            f"{intervalo.iloc[i, 1]:.2f}"
-        ])
-    story.append(Table(dados))
-    story.append(Spacer(1, 24))
-    fig, ax = plt.subplots(figsize=(6, 3))
-    ax.plot(datas, media, label="Previsão", color="orange")
-    ax.fill_between(datas, intervalo.iloc[:, 0], intervalo.iloc[:, 1], color="orange", alpha=0.3)
-    ax.set_title(f"Previsão ARIMA - {produto}")
-    ax.set_xlabel("Data")
-    ax.set_ylabel(f"R$/{unidade}")
-    ax.legend()
-    plt.tight_layout()
-    img_buffer = BytesIO()
-    fig.savefig(img_buffer, format="png")
-    plt.close(fig)
-    img_buffer.seek(0)
-    story.append(Image(img_buffer, width=400, height=200))
-    doc.build(story)
-    buffer.seek(0)
-    return buffer
 
 # ======= EXECUÇÃO PRINCIPAL =======
 df_base = carregar_base()
@@ -208,17 +169,6 @@ try:
     else:
         st.warning("Não foi possível calcular o RMSE (dados insuficientes).")
 
-    # PDF
-    pdf_buffer = gerar_pdf(produto, (p, d, q), datas_prev, media_prev, intervalo_prev, unidade)
-    st.download_button(
-        label="📄 Gerar PDF da previsão",
-        data=pdf_buffer,
-        file_name=f"previsao_arima_{produto.lower().replace(' ', '_')}.pdf",
-        mime="application/pdf"
-    )
-
-except Exception as e:
-    st.error(f"Erro ao calcular previsão: {repr(e)}")
 
 
 # ======= RODAPÉ =======
